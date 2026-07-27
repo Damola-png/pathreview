@@ -25,3 +25,23 @@ The `POST /reviews` flow passes the authenticated `user_id` into `create_review`
 **Setup confirmation:** [x] App runs locally at localhost:5173
 
 **Cohort ledger:** [ ] Issue added to cohort ledger
+
+
+
+
+
+## Week 8 — Reproduction & solution planning
+
+**Reproduction commit link:**
+[https://github.com/Damola-png/pathreview/commit/13aa66480b8fd02bed5ed4e4a26f43efc2a7306e]
+
+**Reproduction summary:**
+I reproduced Issue#163 by adding a targeted unit test where the authenticated user attempts to create a review for a profile owned by another user. The test failed because `create_review()` still called `db.add()` and created a pending review instead of rejecting the unauthorized request, confirming that profile ownership is not currently checked during review creation.
+
+**PLAN.md link:**
+https://github.com/Damola-png/pathreview/blob/fix/163-review-profile-ownership/PLAN.md
+
+
+
+**Blockers or open questions:**
+I still need to confirm the expected error response when a profile does not exist or belongs to another user. The existing read endpoints use ownership filtering and return a 404 when the requested resource cannot be accessed, so I will determine whether review creation should follow the same behavior. There are also unrelated existing `AsyncMock` failures in some review service tests, so I will use targeted tests for Issue #163 while implementing and validating the fix.
