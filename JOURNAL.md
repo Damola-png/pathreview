@@ -45,3 +45,39 @@ https://github.com/Damola-png/pathreview/blob/fix/163-review-profile-ownership/P
 
 **Blockers or open questions:**
 I still need to confirm the expected error response when a profile does not exist or belongs to another user. The existing read endpoints use ownership filtering and return a 404 when the requested resource cannot be accessed, so I will determine whether review creation should follow the same behavior. There are also unrelated existing `AsyncMock` failures in some review service tests, so I will use targeted tests for Issue #163 while implementing and validating the fix.
+
+
+
+## Week 9 — Solution building & PR submission
+
+### Check-in 1 (mid-week)
+
+**Current progress:**
+Implemented Issue #163 by adding profile ownership validation inside `create_review()` so review creation only succeeds when the requested profile belongs to the authenticated user. Unauthorized or non-existent profiles now return a `404 Profile not found` before any review is added or committed. Updated `tests/unit/test_review_service.py` with ownership-aware setup and verification for both allowed and rejected creation paths.
+
+**Next steps:**
+Open a draft PR, request peer/mentor feedback in Slack, and finalize the PR description with baseline vs post-change check/test results. Re-run project checks before marking the PR ready and update this journal with the submitted PR link.
+
+**Blockers:**
+`make` is not available in this Windows PowerShell environment, so I ran equivalent commands via `.venv\\Scripts` (`ruff`, `black --check`, `mypy`, and `pytest`) to validate behavior.
+
+---
+
+### Check-in 2 (end of week)
+
+**PR link:** [add your submitted PR link]
+
+**Branch:** fix/163-review-profile-ownership
+
+**What you built:**
+Added an authorization guard in the review creation service that checks `(profile_id, user_id)` ownership before constructing a `Review`. This closes the cross-user creation gap by rejecting inaccessible profiles with a 404 response and preventing any database writes for unauthorized requests.
+
+**Tests added or updated:**
+Updated `tests/unit/test_review_service.py` to cover the ownership rejection path (`test_create_review_rejects_profile_owned_by_another_user`) and to keep the review service suite stable with SQLAlchemy execute-result mocks. Focused run: `pytest tests/unit/test_review_service.py -v -m unit` (20 passed).
+
+**Self-review confirmation:** [ ] make check passes  [ ] make test-unit passes
+
+**Draft PR feedback received from:** none
+
+**Pre-existing failures observed:**
+Project-wide `check` and `test-unit` equivalents still report existing unrelated failures in other modules (for example: safety, parsing, scoring, and detector tests). After this fix, the previously failing `tests/unit/test_review_service.py` cases related to Issue #163 are now passing, and no new failures were introduced in the touched review service scope.
