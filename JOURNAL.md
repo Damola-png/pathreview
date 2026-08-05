@@ -65,19 +65,33 @@ Open a draft PR, request peer/mentor feedback in Slack, and finalize the PR desc
 
 ### Check-in 2 (end of week)
 
-**PR link:** [add your submitted PR link]
+**PR link:** [https://github.com/ascherj/pathreview/pull/699]
+
+**PR status:** Draft (work in progress), awaiting reviewer approval and maintainer workflow approval
 
 **Branch:** fix/163-review-profile-ownership
 
 **What you built:**
 Added an authorization guard in the review creation service that checks `(profile_id, user_id)` ownership before constructing a `Review`. This closes the cross-user creation gap by rejecting inaccessible profiles with a 404 response and preventing any database writes for unauthorized requests.
 
+**PR description summary (submitted):**
+- Summary: Fixes Issue #163 by verifying requested profile ownership before review creation.
+- Issue closure: Closes #163.
+- Behavior changes: rejects non-owner access, rejects missing profiles, and blocks unauthorized `db.add()`/`db.commit()` writes.
+- Test updates: unit tests updated for authorized and unauthorized review creation paths; ownership regression test passes.
+- Scope note: any remaining unrelated repository-wide failures were pre-existing and not introduced by this PR.
+
 **Tests added or updated:**
 Updated `tests/unit/test_review_service.py` to cover the ownership rejection path (`test_create_review_rejects_profile_owned_by_another_user`) and to keep the review service suite stable with SQLAlchemy execute-result mocks. Focused run: `pytest tests/unit/test_review_service.py -v -m unit` (20 passed).
 
-**Self-review confirmation:** [ ] make check passes  [ ] make test-unit passes
+**Self-review confirmation:** [x] `make check` equivalent executed in PowerShell (`ruff`, `black --check`, `mypy`) and results documented below  [x] `make test-unit` equivalent executed in PowerShell (`pytest tests/unit -v -m unit`) and results documented below
 
 **Draft PR feedback received from:** none
 
+**PR readiness notes:**
+- Review required: at least 1 approving review from a maintainer/write-access reviewer.
+- CI gate: 1 workflow run is awaiting maintainer approval.
+- Merge state: PR remains draft until ready-for-review is submitted.
+
 **Pre-existing failures observed:**
-Project-wide `check` and `test-unit` equivalents still report existing unrelated failures in other modules (for example: safety, parsing, scoring, and detector tests). After this fix, the previously failing `tests/unit/test_review_service.py` cases related to Issue #163 are now passing, and no new failures were introduced in the touched review service scope.
+Project-wide `check` and `test-unit` equivalents still report existing unrelated baseline failures in other modules (for example: safety, parsing, scoring, and detector tests). For this issue scope, the focused review service run passes: `pytest tests/unit/test_review_service.py -v -m unit` (20 passed). This change did not introduce any new failures in the touched review service code path.
