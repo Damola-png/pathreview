@@ -95,3 +95,34 @@ Updated `tests/unit/test_review_service.py` to cover the ownership rejection pat
 
 **Pre-existing failures observed:**
 Project-wide `check` and `test-unit` equivalents still report existing unrelated baseline failures in other modules (for example: safety, parsing, scoring, and detector tests). For this issue scope, the focused review service run passes: `pytest tests/unit/test_review_service.py -v -m unit` (20 passed). This change did not introduce any new failures in the touched review service code path.
+
+## Week 10 — Iteration & reflection
+
+### Reviewer feedback
+
+**Feedback received:** [ ] Yes  [x] No — still awaiting review
+
+**Summary of feedback:**
+No reviewer feedback was provided during the Summer 2026 cycle. The module notes that reviewer feedback is not a standard feature for this term, so there were no maintainer comments to address for this issue.
+
+**How you responded:**
+No direct review comments were available, so there were no code or documentation changes to make in response to reviewer feedback. I used the time to finalize the implementation record, confirm the working branch state, and write the reflection below.
+
+---
+
+### Reflection
+
+**What was harder than you expected?**
+The hardest part was not writing the ownership check itself; it was validating the behavior in a way that matched the project's existing authorization patterns. I had to trace the read path and compare it to the create path, then make sure the fix was consistent without widening the scope or introducing a different failure mode. The repository also had unrelated failing tests and baseline noise, which made it easy to second-guess whether a problem was caused by my change or by pre-existing state.
+
+**What did you learn about working in a large codebase?**
+I learned that production code is less about writing a clever solution and more about matching an existing design language. In a larger codebase, the important work is often understanding the access patterns, conventions, and failure semantics already used by the team. A small change like enforcing profile ownership sounds straightforward, but it matters whether the app treats unauthorized access as a 404, a 403, or a silent rejection, and those conventions are shaped by the broader codebase rather than by any single function.
+
+**How did AI tools help — and where did they fall short?**
+AI was especially useful for narrowing the issue quickly: it helped me trace the create-review flow, identify the missing ownership guard, and draft a focused regression test. It also helped me reason about likely side effects and suggest a path that kept the patch minimal. The limitations showed up when I needed to validate against the actual repository semantics and non-obvious conventions, especially around error handling and existing test patterns. In other words, AI accelerated the initial investigation, but the final judgment still had to come from reading the relevant service and route behavior and confirming the expected contract with the codebase itself.
+
+**What would you do differently if you started over?**
+I would spend a bit more time upfront checking the surrounding ownership conventions and the exact error contract before implementing the fix. That would reduce the back-and-forth of confirming whether a missing profile or cross-user access should raise the same error as the read endpoints. I would also isolate the regression test even more aggressively and run the smallest relevant suite earlier, so I could tell more quickly whether the fix was behaving correctly without being distracted by unrelated repo-level failures.
+
+**What are you most proud of from this module?**
+I am most proud of the fact that the fix addressed a real authorization gap in the service layer and was supported by a targeted regression test. It was a useful reminder that secure behavior is sometimes about preventing the wrong action before a write happens, not just responding to it afterward. The final patch was small but meaningful, and it confirmed that careful reasoning can improve safety without overcomplicating the code.
