@@ -41,6 +41,7 @@ dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
     "pytest-asyncio>=0.23.0",
+    "aiosqlite>=0.20.0",
     "pytest-benchmark>=4.0.0",
     "pytest-httpserver>=1.0.8",
     "hypothesis>=6.92.0",
