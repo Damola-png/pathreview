@@ -17,6 +17,8 @@ from api.routes import health
 from core import config
 from core.database import get_db
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def healthy_dependencies(monkeypatch: pytest.MonkeyPatch) -> None:
